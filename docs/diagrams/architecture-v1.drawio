@@ -1,0 +1,63 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="Pf0vRdoQMa2BFOXsf5MS">
+    <mxGraphModel dx="934" dy="4448" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-1" parent="1" style="whiteSpace=wrap;html=1;" value="React Frontend" vertex="1">
+          <mxGeometry height="82" width="248" x="205" y="-3204" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-12" edge="1" parent="1" source="a80UVEY7B1ZYEv6npJUe-7" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;endArrow=classic;endFill=1;exitX=0.164;exitY=1.018;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="243" y="-2844.1800000000003" />
+            </Array>
+            <mxPoint x="243" y="-2909" as="sourcePoint" />
+            <mxPoint x="243" y="-2828.1800000000003" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-26" edge="1" parent="1" source="a80UVEY7B1ZYEv6npJUe-7" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" target="a80UVEY7B1ZYEv6npJUe-25" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-8" edge="1" parent="1" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;" value="">
+          <mxGeometry relative="1" width="140" as="geometry">
+            <Array as="points" />
+            <mxPoint x="328.5" y="-3109" as="sourcePoint" />
+            <mxPoint x="328.5" y="-3037.82" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=16;" value="&amp;nbsp; REST API" vertex="1">
+          <mxGeometry height="30" width="113" x="316" y="-3097" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-11" parent="1" style="whiteSpace=wrap;html=1;" value="MySQL 8 DataBase" vertex="1">
+          <mxGeometry height="70" width="199.5" x="146" y="-2826" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-18" edge="1" parent="1" source="a80UVEY7B1ZYEv6npJUe-7" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=0.831;exitY=0.995;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" width="140" as="geometry">
+            <Array as="points" />
+            <mxPoint x="429.004" y="-2921.236" as="sourcePoint" />
+            <mxPoint x="429.56" y="-2826" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-19" parent="1" style="whiteSpace=wrap;html=1;" value="Weather API External Service" vertex="1">
+          <mxGeometry height="70" width="226" x="360" y="-2826" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="User Roles&amp;nbsp;&lt;div&gt;--------------------------------------------------&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Farmer&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Agricultural Officer&lt;/div&gt;&lt;div&gt;Admin&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="87" width="204" x="561" y="-3019" as="geometry" />
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-27" edge="1" parent="1" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;" value="">
+          <mxGeometry relative="1" width="140" as="geometry">
+            <Array as="points">
+              <mxPoint x="272.21" y="-3007" />
+            </Array>
+            <mxPoint x="253.79" y="-3007" as="sourcePoint" />
+            <mxPoint x="276.09" y="-3009.91" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a80UVEY7B1ZYEv6npJUe-7" parent="1" style="whiteSpace=wrap;html=1;" value="Spring boot Backend&lt;div&gt;--------------------------------------------------------------------&lt;br&gt;&lt;div&gt;Controller&lt;/div&gt;&lt;div&gt;service&lt;/div&gt;&lt;div&gt;Repository / JPA&lt;/div&gt;&lt;div&gt;Spring Security +JWT&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="94" width="277" x="197" y="-3026" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

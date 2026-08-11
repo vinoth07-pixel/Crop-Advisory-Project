@@ -30,7 +30,12 @@ public class AdvisoryRequestController {
     public AdvisoryRequest getRequestById(@PathVariable int id) {
         return advisoryRequestService.getAdvisoryRequestById(id);
     }
-
+    @PutMapping("/{id}")
+    public AdvisoryRequest updateRequest(
+        @PathVariable int id,
+        @RequestBody AdvisoryRequest request) {
+      return advisoryRequestService.updateAdvisoryRequest(id, request);
+    }
     @DeleteMapping("/{id}")
     public void deleteRequest(@PathVariable int id) {
         advisoryRequestService.deleteAdvisoryRequest(id);

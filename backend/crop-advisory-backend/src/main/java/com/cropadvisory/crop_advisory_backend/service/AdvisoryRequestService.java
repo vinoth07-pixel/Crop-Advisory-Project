@@ -26,7 +26,21 @@ public class AdvisoryRequestService {
     public AdvisoryRequest getAdvisoryRequestById(int id) {
         return advisoryRequestRepository.findById(id).orElse(null);
     }
+    public AdvisoryRequest updateAdvisoryRequest(int id, AdvisoryRequest request) {
+    AdvisoryRequest existing = advisoryRequestRepository.findById(id).orElse(null);
 
+    if (existing == null) {
+        return null;
+    }
+
+    existing.setFarmer(request.getFarmer());
+    existing.setCrop(request.getCrop());
+    existing.setAdvisory(request.getAdvisory());
+    existing.setQuestion(request.getQuestion());
+    existing.setStatus(request.getStatus());
+
+    return advisoryRequestRepository.save(existing);
+    }
     public void deleteAdvisoryRequest(int id) {
         advisoryRequestRepository.deleteById(id);
     }

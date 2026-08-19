@@ -18,6 +18,16 @@ function Dashboard() {
   const [showWeather, setShowWeather] = useState(false);
   const [weatherMessage, setWeatherMessage] = useState("");
 
+  const [showAdvisoryForm, setShowAdvisoryForm] = useState(false);
+  const [selectedCrop, setSelectedCrop] = useState("");
+  const [question, setQuestion] = useState("");
+  const [advisoryMessage, setAdvisoryMessage] = useState("");
+  const [submittingAdvisory, setSubmittingAdvisory] = useState(false);
+
+  const [requests, setRequests] = useState([]);
+  const [showRequests, setShowRequests] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
+
   const handleViewFarms = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -87,6 +97,162 @@ function Dashboard() {
     }
   };
 
+  const handleAskAdvisory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (crops.length === 0) {
+        const response = await axios.get(
+          "http://localhost:8080/api/crops",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setCrops(response.data);
+      }
+
+      setAdvisoryMessage("");
+      setShowAdvisoryForm(true);
+    } catch (error) {
+      console.error("Failed to load crops:", error);
+      setAdvisoryMessage("Unable to load crops.");
+      setShowAdvisoryForm(true);
+    }
+  };
+
+  const handleSubmitAdvisory = async (e) => {
+    e.preventDefault();
+
+    if (!selectedCrop) {
+      setAdvisoryMessage("Please select a crop.");
+      return;
+    }
+
+    if (!question.trim()) {
+      setAdvisoryMessage("Please enter your question.");
+      return;
+    }
+
+    try {
+      setSubmittingAdvisory(true);
+      setAdvisoryMessage("");
+
+      const token = localStorage.getItem("token");
+
+      const usersResponse = await axios.get(
+        "http://localhost:8080/api/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const currentUser = usersResponse.data.find(
+        (user) => user.email === email
+      );
+
+      if (!currentUser) {
+        setAdvisoryMessage("Farmer account not found.");
+        return;
+      }
+
+      const requestData = {
+        requestId: 0,
+
+        farmer: {
+          userId: currentUser.userId
+        },
+
+        crop: {
+          cropId: Number(selectedCrop)
+        },
+
+        advisory: null,
+
+        question: question,
+
+        status: "PENDING",
+
+        createdAt: new Date().toISOString()
+      };
+
+      const response = await axios.post(
+        "http://localhost:8080/api/advisory-requests",
+        requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      console.log(
+        "Advisory request created:",
+        response.data
+      );
+
+      setAdvisoryMessage(
+        "Advisory request submitted successfully! ✅"
+      );
+
+      setQuestion("");
+      setSelectedCrop("");
+
+    } catch (error) {
+      console.error(
+        "Failed to submit advisory request:",
+        error
+      );
+
+      if (error.response) {
+        setAdvisoryMessage(
+          "Unable to submit advisory request."
+        );
+      } else {
+        setAdvisoryMessage(
+          "Backend server is not connected."
+        );
+      }
+    } finally {
+      setSubmittingAdvisory(false);
+    }
+  };
+
+  const handleViewRequests = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:8080/api/advisory-requests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRequests(response.data);
+      setRequestMessage("");
+      setShowRequests(true);
+    } catch (error) {
+      console.error(
+        "Failed to fetch requests:",
+        error
+      );
+
+      setRequestMessage(
+        "Unable to load advisory requests."
+      );
+
+      setShowRequests(true);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
@@ -99,12 +265,14 @@ function Dashboard() {
     <div className="dashboard">
 
       <header className="dashboard-header">
+
         <div>
           <h1>🌱 Crop Advisory</h1>
           <p>Farmer Dashboard</p>
         </div>
 
         <div className="user-section">
+
           <span>{email}</span>
 
           <span className="role">
@@ -114,24 +282,31 @@ function Dashboard() {
           <button onClick={handleLogout}>
             Logout
           </button>
+
         </div>
+
       </header>
 
       <main className="dashboard-content">
 
         <div className="welcome">
+
           <h2>Welcome, Farmer 👋</h2>
 
           <p>
-            Manage your farms, crops, weather information and advisory
-            requests from one place.
+            Manage your farms, crops, weather information
+            and advisory requests from one place.
           </p>
+
         </div>
 
         <div className="dashboard-grid">
 
           <div className="dashboard-card">
-            <div className="card-icon">🚜</div>
+
+            <div className="card-icon">
+              🚜
+            </div>
 
             <h3>My Farms</h3>
 
@@ -142,10 +317,14 @@ function Dashboard() {
             <button onClick={handleViewFarms}>
               View Farms
             </button>
+
           </div>
 
           <div className="dashboard-card">
-            <div className="card-icon">🌱</div>
+
+            <div className="card-icon">
+              🌱
+            </div>
 
             <h3>My Crops</h3>
 
@@ -156,10 +335,14 @@ function Dashboard() {
             <button onClick={handleViewCrops}>
               View Crops
             </button>
+
           </div>
 
           <div className="dashboard-card">
-            <div className="card-icon">🌦️</div>
+
+            <div className="card-icon">
+              🌦️
+            </div>
 
             <h3>Weather</h3>
 
@@ -170,10 +353,14 @@ function Dashboard() {
             <button onClick={handleViewWeather}>
               View Weather
             </button>
+
           </div>
 
           <div className="dashboard-card">
-            <div className="card-icon">💬</div>
+
+            <div className="card-icon">
+              💬
+            </div>
 
             <h3>Ask Advisory</h3>
 
@@ -181,13 +368,17 @@ function Dashboard() {
               Send your farming questions to an officer.
             </p>
 
-            <button>
+            <button onClick={handleAskAdvisory}>
               Ask Now
             </button>
+
           </div>
 
           <div className="dashboard-card">
-            <div className="card-icon">📋</div>
+
+            <div className="card-icon">
+              📋
+            </div>
 
             <h3>My Requests</h3>
 
@@ -195,29 +386,40 @@ function Dashboard() {
               Track your advisory requests and responses.
             </p>
 
-            <button>
+            <button onClick={handleViewRequests}>
               View Requests
             </button>
+
           </div>
 
         </div>
 
         {showFarms && (
           <div className="farm-section">
+
             <h2>My Farms 🚜</h2>
 
             {farmMessage ? (
-              <p className="farm-message">{farmMessage}</p>
+              <p className="farm-message">
+                {farmMessage}
+              </p>
             ) : farms.length === 0 ? (
-              <p className="farm-message">No farms found.</p>
+              <p className="farm-message">
+                No farms found.
+              </p>
             ) : (
               <div className="farm-list">
+
                 {farms.map((farm) => (
+
                   <div
                     className="farm-card"
                     key={farm.farmId}
                   >
-                    <h3>Farm #{farm.farmId}</h3>
+
+                    <h3>
+                      Farm #{farm.farmId}
+                    </h3>
 
                     <p>
                       <strong>Location:</strong>{" "}
@@ -233,29 +435,43 @@ function Dashboard() {
                       <strong>Soil Type:</strong>{" "}
                       {farm.soilType || "Not available"}
                     </p>
+
                   </div>
+
                 ))}
+
               </div>
             )}
+
           </div>
         )}
 
         {showCrops && (
           <div className="farm-section">
+
             <h2>My Crops 🌱</h2>
 
             {cropMessage ? (
-              <p className="farm-message">{cropMessage}</p>
+              <p className="farm-message">
+                {cropMessage}
+              </p>
             ) : crops.length === 0 ? (
-              <p className="farm-message">No crops found.</p>
+              <p className="farm-message">
+                No crops found.
+              </p>
             ) : (
               <div className="farm-list">
+
                 {crops.map((crop) => (
+
                   <div
                     className="farm-card"
                     key={crop.cropId}
                   >
-                    <h3>{crop.cropName}</h3>
+
+                    <h3>
+                      {crop.cropName}
+                    </h3>
 
                     <p>
                       <strong>Season:</strong>{" "}
@@ -271,15 +487,20 @@ function Dashboard() {
                       <strong>Description:</strong>{" "}
                       {crop.description || "Not available"}
                     </p>
+
                   </div>
+
                 ))}
+
               </div>
             )}
+
           </div>
         )}
 
         {showWeather && (
           <div className="farm-section">
+
             <h2>Weather Information 🌦️</h2>
 
             {weatherMessage ? (
@@ -292,11 +513,14 @@ function Dashboard() {
               </p>
             ) : (
               <div className="farm-list">
+
                 {weather.map((data) => (
+
                   <div
                     className="farm-card"
                     key={data.weatherId}
                   >
+
                     <h3>
                       Weather #{data.weatherId}
                     </h3>
@@ -320,10 +544,167 @@ function Dashboard() {
                       <strong>Recorded At:</strong>{" "}
                       {data.recordedAt}
                     </p>
+
                   </div>
+
                 ))}
+
               </div>
             )}
+
+          </div>
+        )}
+
+        {showAdvisoryForm && (
+          <div className="farm-section advisory-section">
+
+            <h2>Ask Advisory 💬</h2>
+
+            <form onSubmit={handleSubmitAdvisory}>
+
+              <label>
+                Select Crop
+              </label>
+
+              <select
+                value={selectedCrop}
+                onChange={(e) =>
+                  setSelectedCrop(e.target.value)
+                }
+              >
+
+                <option value="">
+                  Select a crop
+                </option>
+
+                {crops.map((crop) => (
+
+                  <option
+                    key={crop.cropId}
+                    value={crop.cropId}
+                  >
+                    {crop.cropName}
+                  </option>
+
+                ))}
+
+              </select>
+
+              <label>
+                Your Question
+              </label>
+
+              <textarea
+                value={question}
+                onChange={(e) =>
+                  setQuestion(e.target.value)
+                }
+                placeholder="Enter your farming question..."
+                rows="5"
+              />
+
+              <button
+                type="submit"
+                disabled={submittingAdvisory}
+              >
+
+                {submittingAdvisory
+                  ? "Submitting..."
+                  : "Submit Request"}
+
+              </button>
+
+            </form>
+
+            {advisoryMessage && (
+              <p className="farm-message">
+                {advisoryMessage}
+              </p>
+            )}
+
+          </div>
+        )}
+
+        {showRequests && (
+          <div className="farm-section">
+
+            <h2>
+              My Advisory Requests 📋
+            </h2>
+
+            {requestMessage ? (
+
+              <p className="farm-message">
+                {requestMessage}
+              </p>
+
+            ) : requests.length === 0 ? (
+
+              <p className="farm-message">
+                No advisory requests found.
+              </p>
+
+            ) : (
+
+              <div className="farm-list">
+
+                {requests.map((request) => (
+
+                  <div
+                    className="farm-card"
+                    key={request.requestId}
+                  >
+
+                    <h3>
+                      Request #{request.requestId}
+                    </h3>
+
+                    <p>
+                      <strong>Question:</strong>{" "}
+                      {request.question}
+                    </p>
+
+                    <p>
+                      <strong>Status:</strong>{" "}
+                      {request.status}
+                    </p>
+
+                    {request.crop && (
+                      <p>
+                        <strong>Crop:</strong>{" "}
+                        {request.crop.cropName}
+                      </p>
+                    )}
+
+                    {request.advisory && (
+                      <>
+
+                        <p>
+                          <strong>Advisory:</strong>{" "}
+                          {request.advisory.title}
+                        </p>
+
+                        <p>
+                          <strong>Answer:</strong>{" "}
+                          {request.advisory.content}
+                        </p>
+
+                      </>
+                    )}
+
+                    <p>
+                      <strong>Created:</strong>{" "}
+                      {request.createdAt}
+                    </p>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            )}
+
           </div>
         )}
 

@@ -53,6 +53,7 @@
 
 .welcome {
   margin-bottom: 30px;
+  text-align: center;
 }
 
 .welcome h2 {
@@ -74,6 +75,7 @@
   background: white;
   padding: 25px;
   border-radius: 14px;
+  text-align: center;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -84,6 +86,7 @@
 
 .dashboard-card h3 {
   margin: 8px 0;
+  color: #555;
 }
 
 .dashboard-card p {
@@ -101,8 +104,54 @@
   cursor: pointer;
 }
 
+.dashboard-card button:hover {
+  background: #256628;
+}
+
+.farm-section {
+  margin-top: 40px;
+}
+
+.farm-section h2 {
+  margin-bottom: 20px;
+  color: #2e7d32;
+}
+
+.farm-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.farm-card {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.farm-card h3 {
+  margin-top: 0;
+  color: #2e7d32;
+}
+
+.farm-card p {
+  color: #555;
+}
+
+.farm-message {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  color: #666;
+}
+
 @media (max-width: 800px) {
   .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .farm-list {
     grid-template-columns: 1fr;
   }
 
@@ -110,5 +159,10 @@
     padding: 20px;
     flex-direction: column;
     gap: 15px;
+  }
+
+  .user-section {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import Dashboard from "./Dashboard";
 import "./App.css";
 
 function App() {
@@ -7,6 +8,10 @@ function App() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [loggedIn, setLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +34,8 @@ function App() {
       localStorage.setItem("role", response.data.role);
 
       setMessage("Login successful!");
-      
+      setLoggedIn(true);
+
       console.log("Token:", token);
       console.log("Role:", response.data.role);
     } catch (error) {
@@ -43,6 +49,10 @@ function App() {
     setLoading(false);
   };
 
+  if (loggedIn) {
+    return <Dashboard />;
+  }
+
   return (
     <div className="login-page">
       <div className="login-card">
@@ -51,6 +61,7 @@ function App() {
 
         <form onSubmit={handleLogin}>
           <label>Email</label>
+
           <input
             type="email"
             placeholder="Enter your email"
@@ -60,6 +71,7 @@ function App() {
           />
 
           <label>Password</label>
+
           <input
             type="password"
             placeholder="Enter your password"

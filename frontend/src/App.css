@@ -25,13 +25,18 @@ body {
 
 .login-card h1 {
   text-align: center;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
 }
 
-.subtitle {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #666;
+.login-card {
+  width: 400px;
+  padding: 40px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .login-card label {

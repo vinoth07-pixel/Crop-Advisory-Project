@@ -10,6 +10,10 @@ function Dashboard() {
   const [showFarms, setShowFarms] = useState(false);
   const [farmMessage, setFarmMessage] = useState("");
 
+  const [crops, setCrops] = useState([]);
+  const [showCrops, setShowCrops] = useState(false);
+  const [cropMessage, setCropMessage] = useState("");
+
   const handleViewFarms = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -30,6 +34,29 @@ function Dashboard() {
       console.error("Failed to fetch farms:", error);
       setFarmMessage("Unable to load farms.");
       setShowFarms(true);
+    }
+  };
+
+  const handleViewCrops = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:8080/api/crops",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setCrops(response.data);
+      setCropMessage("");
+      setShowCrops(true);
+    } catch (error) {
+      console.error("Failed to fetch crops:", error);
+      setCropMessage("Unable to load crops.");
+      setShowCrops(true);
     }
   };
 
@@ -99,7 +126,7 @@ function Dashboard() {
               View your crops and crop information.
             </p>
 
-            <button>
+            <button onClick={handleViewCrops}>
               View Crops
             </button>
           </div>
@@ -187,6 +214,56 @@ function Dashboard() {
                     <p>
                       <strong>Soil Type:</strong>{" "}
                       {farm.soilType || "Not available"}
+                    </p>
+
+                  </div>
+                ))}
+
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {showCrops && (
+          <div className="farm-section">
+
+            <h2>My Crops 🌱</h2>
+
+            {cropMessage ? (
+              <p className="farm-message">
+                {cropMessage}
+              </p>
+            ) : crops.length === 0 ? (
+              <p className="farm-message">
+                No crops found.
+              </p>
+            ) : (
+              <div className="farm-list">
+
+                {crops.map((crop) => (
+                  <div
+                    className="farm-card"
+                    key={crop.cropId}
+                  >
+
+                    <h3>
+                      {crop.cropName}
+                    </h3>
+
+                    <p>
+                      <strong>Season:</strong>{" "}
+                      {crop.season || "Not available"}
+                    </p>
+
+                    <p>
+                      <strong>Soil Requirement:</strong>{" "}
+                      {crop.soilRequirement || "Not available"}
+                    </p>
+
+                    <p>
+                      <strong>Description:</strong>{" "}
+                      {crop.description || "Not available"}
                     </p>
 
                   </div>

@@ -14,6 +14,10 @@ function Dashboard() {
   const [showCrops, setShowCrops] = useState(false);
   const [cropMessage, setCropMessage] = useState("");
 
+  const [weather, setWeather] = useState([]);
+  const [showWeather, setShowWeather] = useState(false);
+  const [weatherMessage, setWeatherMessage] = useState("");
+
   const handleViewFarms = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -57,6 +61,29 @@ function Dashboard() {
       console.error("Failed to fetch crops:", error);
       setCropMessage("Unable to load crops.");
       setShowCrops(true);
+    }
+  };
+
+  const handleViewWeather = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:8080/api/weather",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setWeather(response.data);
+      setWeatherMessage("");
+      setShowWeather(true);
+    } catch (error) {
+      console.error("Failed to fetch weather:", error);
+      setWeatherMessage("Unable to load weather information.");
+      setShowWeather(true);
     }
   };
 
@@ -140,7 +167,7 @@ function Dashboard() {
               Check weather information for your farm.
             </p>
 
-            <button>
+            <button onClick={handleViewWeather}>
               View Weather
             </button>
           </div>
@@ -177,29 +204,20 @@ function Dashboard() {
 
         {showFarms && (
           <div className="farm-section">
-
             <h2>My Farms 🚜</h2>
 
             {farmMessage ? (
-              <p className="farm-message">
-                {farmMessage}
-              </p>
+              <p className="farm-message">{farmMessage}</p>
             ) : farms.length === 0 ? (
-              <p className="farm-message">
-                No farms found.
-              </p>
+              <p className="farm-message">No farms found.</p>
             ) : (
               <div className="farm-list">
-
                 {farms.map((farm) => (
                   <div
                     className="farm-card"
                     key={farm.farmId}
                   >
-
-                    <h3>
-                      Farm #{farm.farmId}
-                    </h3>
+                    <h3>Farm #{farm.farmId}</h3>
 
                     <p>
                       <strong>Location:</strong>{" "}
@@ -215,41 +233,29 @@ function Dashboard() {
                       <strong>Soil Type:</strong>{" "}
                       {farm.soilType || "Not available"}
                     </p>
-
                   </div>
                 ))}
-
               </div>
             )}
-
           </div>
         )}
 
         {showCrops && (
           <div className="farm-section">
-
             <h2>My Crops 🌱</h2>
 
             {cropMessage ? (
-              <p className="farm-message">
-                {cropMessage}
-              </p>
+              <p className="farm-message">{cropMessage}</p>
             ) : crops.length === 0 ? (
-              <p className="farm-message">
-                No crops found.
-              </p>
+              <p className="farm-message">No crops found.</p>
             ) : (
               <div className="farm-list">
-
                 {crops.map((crop) => (
                   <div
                     className="farm-card"
                     key={crop.cropId}
                   >
-
-                    <h3>
-                      {crop.cropName}
-                    </h3>
+                    <h3>{crop.cropName}</h3>
 
                     <p>
                       <strong>Season:</strong>{" "}
@@ -265,13 +271,59 @@ function Dashboard() {
                       <strong>Description:</strong>{" "}
                       {crop.description || "Not available"}
                     </p>
-
                   </div>
                 ))}
-
               </div>
             )}
+          </div>
+        )}
 
+        {showWeather && (
+          <div className="farm-section">
+            <h2>Weather Information 🌦️</h2>
+
+            {weatherMessage ? (
+              <p className="farm-message">
+                {weatherMessage}
+              </p>
+            ) : weather.length === 0 ? (
+              <p className="farm-message">
+                No weather data found.
+              </p>
+            ) : (
+              <div className="farm-list">
+                {weather.map((data) => (
+                  <div
+                    className="farm-card"
+                    key={data.weatherId}
+                  >
+                    <h3>
+                      Weather #{data.weatherId}
+                    </h3>
+
+                    <p>
+                      <strong>Temperature:</strong>{" "}
+                      {data.temperature} °C
+                    </p>
+
+                    <p>
+                      <strong>Humidity:</strong>{" "}
+                      {data.humidity} %
+                    </p>
+
+                    <p>
+                      <strong>Rainfall:</strong>{" "}
+                      {data.rainfall} mm
+                    </p>
+
+                    <p>
+                      <strong>Recorded At:</strong>{" "}
+                      {data.recordedAt}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

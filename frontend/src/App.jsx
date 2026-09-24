@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Dashboard from "./Dashboard";
+import OfficerDashboard from "./OfficerDashboard";
 import "./App.css";
 
 function App() {
@@ -13,8 +14,11 @@ function App() {
     !!localStorage.getItem("token")
   );
 
+  const role = localStorage.getItem("role");
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     setMessage("");
 
@@ -23,7 +27,7 @@ function App() {
         "http://localhost:8080/api/auth/login",
         {
           email: email,
-          password: password,
+          password: password
         }
       );
 
@@ -36,8 +40,6 @@ function App() {
       setMessage("Login successful!");
       setLoggedIn(true);
 
-      console.log("Token:", token);
-      console.log("Role:", response.data.role);
     } catch (error) {
       if (error.response) {
         setMessage("Invalid email or password");
@@ -50,16 +52,28 @@ function App() {
   };
 
   if (loggedIn) {
+    const userRole = localStorage.getItem("role");
+
+    if (userRole === "OFFICER") {
+      return <OfficerDashboard />;
+    }
+
     return <Dashboard />;
   }
 
   return (
     <div className="login-page">
+
       <div className="login-card">
+
         <h1>Crop Advisory</h1>
-        <p className="subtitle">Login to your account</p>
+
+        <p className="subtitle">
+          Login to your account
+        </p>
 
         <form onSubmit={handleLogin}>
+
           <label>Email</label>
 
           <input
@@ -80,13 +94,23 @@ function App() {
             required
           />
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
+
         </form>
 
-        {message && <p className="message">{message}</p>}
+        {message && (
+          <p className="message">
+            {message}
+          </p>
+        )}
+
       </div>
+
     </div>
   );
 }

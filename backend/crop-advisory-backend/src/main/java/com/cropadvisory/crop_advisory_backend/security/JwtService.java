@@ -29,13 +29,19 @@ public class JwtService {
     public String generateToken(String email, String role) {
 
         Map<String, Object> claims = new HashMap<>();
+
         claims.put("role", role);
 
         return Jwts.builder()
                 .claims(claims)
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(
+                    new Date(
+                        System.currentTimeMillis()
+                        + expiration
+                    )
+                )
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -45,19 +51,29 @@ public class JwtService {
     }
 
     public String extractRole(String token) {
-        return getClaims(token).get("role", String.class);
+        return getClaims(token)
+                .get("role", String.class);
     }
 
-    public boolean isTokenValid(String token, String email) {
-        String extractedEmail = extractEmail(token);
-        return extractedEmail.equals(email) && !isTokenExpired(token);
+    public boolean isTokenValid(
+            String token,
+            String email) {
+
+        String extractedEmail =
+                extractEmail(token);
+
+        return extractedEmail.equals(email)
+                && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+        return getClaims(token)
+                .getExpiration()
+                .before(new Date());
     }
 
     private Claims getClaims(String token) {
+
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()

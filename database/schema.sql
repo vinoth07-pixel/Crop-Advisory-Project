@@ -1,7 +1,5 @@
 CREATE DATABASE crop_advisory_db;
-
 USE crop_advisory_db;
-
 CREATE TABLE User (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -10,7 +8,6 @@ CREATE TABLE User (
     role VARCHAR(30) NOT NULL,
     phone VARCHAR(20)
 );
-
 CREATE TABLE FarmerProfile (
     profile_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -18,7 +15,6 @@ CREATE TABLE FarmerProfile (
     experience INT,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
-
 CREATE TABLE Farm (
     farm_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -27,7 +23,6 @@ CREATE TABLE Farm (
     soil_type VARCHAR(100),
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
-
 CREATE TABLE Crop (
     crop_id INT PRIMARY KEY AUTO_INCREMENT,
     crop_name VARCHAR(100) NOT NULL,
@@ -35,7 +30,6 @@ CREATE TABLE Crop (
     soil_requirement VARCHAR(255),
     description VARCHAR(500)
 );
-
 CREATE TABLE Advisory (
     advisory_id INT PRIMARY KEY AUTO_INCREMENT,
     crop_id INT NOT NULL,
@@ -46,7 +40,6 @@ CREATE TABLE Advisory (
     FOREIGN KEY (crop_id) REFERENCES Crop(crop_id),
     FOREIGN KEY (officer_id) REFERENCES User(user_id)
 );
-
 CREATE TABLE AdvisoryRequest (
     request_id INT PRIMARY KEY AUTO_INCREMENT,
     farmer_id INT NOT NULL,
@@ -59,7 +52,6 @@ CREATE TABLE AdvisoryRequest (
     FOREIGN KEY (crop_id) REFERENCES Crop(crop_id),
     FOREIGN KEY (advisory_id) REFERENCES Advisory(advisory_id)
 );
-
 CREATE TABLE WeatherData (
     weather_id INT PRIMARY KEY AUTO_INCREMENT,
     farm_id INT NOT NULL,

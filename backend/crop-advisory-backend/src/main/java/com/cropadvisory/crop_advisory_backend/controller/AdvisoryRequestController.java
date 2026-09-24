@@ -3,13 +3,10 @@ package com.cropadvisory.crop_advisory_backend.controller;
 import com.cropadvisory.crop_advisory_backend.entity.AdvisoryRequest;
 import com.cropadvisory.crop_advisory_backend.service.AdvisoryRequestService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/advisory-requests")
 public class AdvisoryRequestController {
-
     private final AdvisoryRequestService advisoryRequestService;
 
     public AdvisoryRequestController(AdvisoryRequestService advisoryRequestService) {

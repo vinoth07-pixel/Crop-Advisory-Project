@@ -87,4 +87,33 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/reset-officer-password")
+    public ResponseEntity<?> resetOfficerPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword) {
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElse(null);
+
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Officer account not found");
+        }
+
+        if (!"OFFICER".equals(user.getRole())) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("This account is not an officer account");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(
+                "Officer password reset successfully"
+        );
+    }
 }

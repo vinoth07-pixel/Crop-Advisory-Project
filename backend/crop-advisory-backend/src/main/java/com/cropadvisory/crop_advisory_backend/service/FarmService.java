@@ -27,6 +27,23 @@ public class FarmService {
         return farmRepository.findById(id).orElse(null);
     }
 
+    public Farm updateFarm(int id, Farm farm) {
+
+        Farm existingFarm =
+                farmRepository.findById(id).orElse(null);
+
+        if (existingFarm == null) {
+            return null;
+        }
+
+        existingFarm.setUser(farm.getUser());
+        existingFarm.setLocation(farm.getLocation());
+        existingFarm.setArea(farm.getArea());
+        existingFarm.setSoilType(farm.getSoilType());
+
+        return farmRepository.save(existingFarm);
+    }
+
     public void deleteFarm(int id) {
         farmRepository.deleteById(id);
     }

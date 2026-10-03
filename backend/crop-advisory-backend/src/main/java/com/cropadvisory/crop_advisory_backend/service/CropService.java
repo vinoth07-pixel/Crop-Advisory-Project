@@ -27,6 +27,23 @@ public class CropService {
         return cropRepository.findById(id).orElse(null);
     }
 
+    public Crop updateCrop(int id, Crop crop) {
+
+        Crop existingCrop =
+                cropRepository.findById(id).orElse(null);
+
+        if (existingCrop == null) {
+            return null;
+        }
+
+        existingCrop.setCropName(crop.getCropName());
+        existingCrop.setSeason(crop.getSeason());
+        existingCrop.setSoilRequirement(crop.getSoilRequirement());
+        existingCrop.setDescription(crop.getDescription());
+
+        return cropRepository.save(existingCrop);
+    }
+
     public void deleteCrop(int id) {
         cropRepository.deleteById(id);
     }

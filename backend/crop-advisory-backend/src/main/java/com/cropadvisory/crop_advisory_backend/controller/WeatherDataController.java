@@ -31,6 +31,14 @@ public class WeatherDataController {
         return weatherDataService.getWeatherDataById(id);
     }
 
+    @PutMapping("/{id}")
+    public WeatherData updateWeatherData(
+            @PathVariable int id,
+            @RequestBody WeatherData weatherData) {
+
+        return weatherDataService.updateWeatherData(id, weatherData);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteWeatherData(@PathVariable int id) {
         weatherDataService.deleteWeatherData(id);

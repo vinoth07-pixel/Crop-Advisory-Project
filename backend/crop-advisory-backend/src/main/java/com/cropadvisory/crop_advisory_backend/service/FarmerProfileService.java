@@ -27,6 +27,24 @@ public class FarmerProfileService {
         return farmerProfileRepository.findById(id).orElse(null);
     }
 
+    public FarmerProfile updateFarmerProfile(
+            int id,
+            FarmerProfile profile) {
+
+        FarmerProfile existingProfile =
+                farmerProfileRepository.findById(id).orElse(null);
+
+        if (existingProfile == null) {
+            return null;
+        }
+
+        existingProfile.setUser(profile.getUser());
+        existingProfile.setAddress(profile.getAddress());
+        existingProfile.setExperience(profile.getExperience());
+
+        return farmerProfileRepository.save(existingProfile);
+    }
+
     public void deleteFarmerProfile(int id) {
         farmerProfileRepository.deleteById(id);
     }

@@ -27,6 +27,23 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public User updateUser(int id, User user) {
+
+        User existingUser =
+                userRepository.findById(id).orElse(null);
+
+        if (existingUser == null) {
+            return null;
+        }
+
+        existingUser.setName(user.getName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setRole(user.getRole());
+        existingUser.setPhone(user.getPhone());
+
+        return userRepository.save(existingUser);
+    }
+
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }

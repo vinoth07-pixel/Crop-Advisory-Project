@@ -31,6 +31,14 @@ public class CropController {
         return cropService.getCropById(id);
     }
 
+    @PutMapping("/{id}")
+    public Crop updateCrop(
+            @PathVariable int id,
+            @RequestBody Crop crop) {
+
+        return cropService.updateCrop(id, crop);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteCrop(@PathVariable int id) {
         cropService.deleteCrop(id);

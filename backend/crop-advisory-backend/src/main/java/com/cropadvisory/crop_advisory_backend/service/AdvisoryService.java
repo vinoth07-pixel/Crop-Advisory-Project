@@ -27,6 +27,26 @@ public class AdvisoryService {
         return advisoryRepository.findById(id).orElse(null);
     }
 
+    public Advisory updateAdvisory(
+            int id,
+            Advisory advisory) {
+
+        Advisory existingAdvisory =
+                advisoryRepository.findById(id).orElse(null);
+
+        if (existingAdvisory == null) {
+            return null;
+        }
+
+        existingAdvisory.setCrop(advisory.getCrop());
+        existingAdvisory.setOfficer(advisory.getOfficer());
+        existingAdvisory.setTitle(advisory.getTitle());
+        existingAdvisory.setContent(advisory.getContent());
+        existingAdvisory.setCreatedAt(advisory.getCreatedAt());
+
+        return advisoryRepository.save(existingAdvisory);
+    }
+
     public void deleteAdvisory(int id) {
         advisoryRepository.deleteById(id);
     }

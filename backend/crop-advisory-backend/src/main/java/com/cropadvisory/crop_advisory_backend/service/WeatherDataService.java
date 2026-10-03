@@ -27,6 +27,26 @@ public class WeatherDataService {
         return weatherDataRepository.findById(id).orElse(null);
     }
 
+    public WeatherData updateWeatherData(
+            int id,
+            WeatherData weatherData) {
+
+        WeatherData existingWeatherData =
+                weatherDataRepository.findById(id).orElse(null);
+
+        if (existingWeatherData == null) {
+            return null;
+        }
+
+        existingWeatherData.setFarm(weatherData.getFarm());
+        existingWeatherData.setTemperature(weatherData.getTemperature());
+        existingWeatherData.setHumidity(weatherData.getHumidity());
+        existingWeatherData.setRainfall(weatherData.getRainfall());
+        existingWeatherData.setRecordedAt(weatherData.getRecordedAt());
+
+        return weatherDataRepository.save(existingWeatherData);
+    }
+
     public void deleteWeatherData(int id) {
         weatherDataRepository.deleteById(id);
     }

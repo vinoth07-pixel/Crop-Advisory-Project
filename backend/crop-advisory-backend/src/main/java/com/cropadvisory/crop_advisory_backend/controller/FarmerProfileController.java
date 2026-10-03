@@ -31,6 +31,14 @@ public class FarmerProfileController {
         return farmerProfileService.getFarmerProfileById(id);
     }
 
+    @PutMapping("/{id}")
+    public FarmerProfile updateProfile(
+            @PathVariable int id,
+            @RequestBody FarmerProfile profile) {
+
+        return farmerProfileService.updateFarmerProfile(id, profile);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteProfile(@PathVariable int id) {
         farmerProfileService.deleteFarmerProfile(id);

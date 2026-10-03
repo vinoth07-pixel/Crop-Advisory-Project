@@ -31,6 +31,14 @@ public class AdvisoryController {
         return advisoryService.getAdvisoryById(id);
     }
 
+    @PutMapping("/{id}")
+    public Advisory updateAdvisory(
+            @PathVariable int id,
+            @RequestBody Advisory advisory) {
+
+        return advisoryService.updateAdvisory(id, advisory);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteAdvisory(@PathVariable int id) {
         advisoryService.deleteAdvisory(id);

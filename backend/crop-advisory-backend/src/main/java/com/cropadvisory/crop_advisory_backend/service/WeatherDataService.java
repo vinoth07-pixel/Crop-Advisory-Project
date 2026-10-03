@@ -15,9 +15,18 @@ public class WeatherDataService {
         this.weatherDataRepository = weatherDataRepository;
     }
 
-    public WeatherData saveWeatherData(WeatherData weatherData) {
-        return weatherDataRepository.save(weatherData);
+   public WeatherData saveWeatherData(WeatherData weatherData) {
+
+    if (weatherData.getHumidity() < 0 ||
+            weatherData.getHumidity() > 100) {
+
+        throw new IllegalArgumentException(
+                "Humidity must be between 0 and 100");
     }
+
+    return weatherDataRepository.save(weatherData);
+}
+
 
     public List<WeatherData> getAllWeatherData() {
         return weatherDataRepository.findAll();
@@ -27,25 +36,32 @@ public class WeatherDataService {
         return weatherDataRepository.findById(id).orElse(null);
     }
 
-    public WeatherData updateWeatherData(
-            int id,
-            WeatherData weatherData) {
+   public WeatherData updateWeatherData(
+        int id,
+        WeatherData weatherData) {
 
-        WeatherData existingWeatherData =
-                weatherDataRepository.findById(id).orElse(null);
+    if (weatherData.getHumidity() < 0 ||
+            weatherData.getHumidity() > 100) {
 
-        if (existingWeatherData == null) {
-            return null;
-        }
-
-        existingWeatherData.setFarm(weatherData.getFarm());
-        existingWeatherData.setTemperature(weatherData.getTemperature());
-        existingWeatherData.setHumidity(weatherData.getHumidity());
-        existingWeatherData.setRainfall(weatherData.getRainfall());
-        existingWeatherData.setRecordedAt(weatherData.getRecordedAt());
-
-        return weatherDataRepository.save(existingWeatherData);
+        throw new IllegalArgumentException(
+                "Humidity must be between 0 and 100");
     }
+
+    WeatherData existingWeatherData =
+            weatherDataRepository.findById(id).orElse(null);
+
+    if (existingWeatherData == null) {
+        return null;
+    }
+
+    existingWeatherData.setFarm(weatherData.getFarm());
+    existingWeatherData.setTemperature(weatherData.getTemperature());
+    existingWeatherData.setHumidity(weatherData.getHumidity());
+    existingWeatherData.setRainfall(weatherData.getRainfall());
+    existingWeatherData.setRecordedAt(weatherData.getRecordedAt());
+
+    return weatherDataRepository.save(existingWeatherData);
+}
 
     public void deleteWeatherData(int id) {
         weatherDataRepository.deleteById(id);

@@ -15,9 +15,17 @@ public class CropService {
         this.cropRepository = cropRepository;
     }
 
-    public Crop saveCrop(Crop crop) {
-        return cropRepository.save(crop);
+     public Crop saveCrop(Crop crop) {
+
+    if (crop.getCropName() == null ||
+            crop.getCropName().trim().isEmpty()) {
+
+        throw new IllegalArgumentException(
+                "Crop name cannot be empty");
     }
+
+    return cropRepository.save(crop);
+   }
 
     public List<Crop> getAllCrops() {
         return cropRepository.findAll();
@@ -29,20 +37,27 @@ public class CropService {
 
     public Crop updateCrop(int id, Crop crop) {
 
-        Crop existingCrop =
-                cropRepository.findById(id).orElse(null);
+    if (crop.getCropName() == null ||
+            crop.getCropName().trim().isEmpty()) {
 
-        if (existingCrop == null) {
-            return null;
-        }
-
-        existingCrop.setCropName(crop.getCropName());
-        existingCrop.setSeason(crop.getSeason());
-        existingCrop.setSoilRequirement(crop.getSoilRequirement());
-        existingCrop.setDescription(crop.getDescription());
-
-        return cropRepository.save(existingCrop);
+        throw new IllegalArgumentException(
+                "Crop name cannot be empty");
     }
+
+    Crop existingCrop =
+            cropRepository.findById(id).orElse(null);
+
+    if (existingCrop == null) {
+        return null;
+    }
+
+    existingCrop.setCropName(crop.getCropName());
+    existingCrop.setSeason(crop.getSeason());
+    existingCrop.setSoilRequirement(crop.getSoilRequirement());
+    existingCrop.setDescription(crop.getDescription());
+
+    return cropRepository.save(existingCrop);
+}
 
     public void deleteCrop(int id) {
         cropRepository.deleteById(id);

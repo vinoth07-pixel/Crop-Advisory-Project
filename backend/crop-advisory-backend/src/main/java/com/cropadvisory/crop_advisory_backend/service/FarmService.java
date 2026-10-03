@@ -16,7 +16,13 @@ public class FarmService {
     }
 
     public Farm saveFarm(Farm farm) {
-        return farmRepository.save(farm);
+
+    if (farm.getArea() <= 0) {
+        throw new IllegalArgumentException(
+                "Farm area must be greater than zero");
+    }
+
+    return farmRepository.save(farm);
     }
 
     public List<Farm> getAllFarms() {
@@ -29,19 +35,24 @@ public class FarmService {
 
     public Farm updateFarm(int id, Farm farm) {
 
-        Farm existingFarm =
-                farmRepository.findById(id).orElse(null);
+    if (farm.getArea() <= 0) {
+        throw new IllegalArgumentException(
+                "Farm area must be greater than zero");
+    }
 
-        if (existingFarm == null) {
-            return null;
-        }
+    Farm existingFarm =
+            farmRepository.findById(id).orElse(null);
 
-        existingFarm.setUser(farm.getUser());
-        existingFarm.setLocation(farm.getLocation());
-        existingFarm.setArea(farm.getArea());
-        existingFarm.setSoilType(farm.getSoilType());
+    if (existingFarm == null) {
+        return null;
+    }
 
-        return farmRepository.save(existingFarm);
+    existingFarm.setUser(farm.getUser());
+    existingFarm.setLocation(farm.getLocation());
+    existingFarm.setArea(farm.getArea());
+    existingFarm.setSoilType(farm.getSoilType());
+
+    return farmRepository.save(existingFarm);
     }
 
     public void deleteFarm(int id) {

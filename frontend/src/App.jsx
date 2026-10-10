@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import Dashboard from "./Dashboard";
-import OfficerDashboard from "./OfficerDashboard";
+import OfficerDashboard from "./officerDashboard";
 import "./App.css";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -14,8 +16,6 @@ function App() {
     !!localStorage.getItem("token")
   );
 
-  const role = localStorage.getItem("role");
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -24,7 +24,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
+        `${API_URL}/api/auth/login`,
         {
           email: email,
           password: password

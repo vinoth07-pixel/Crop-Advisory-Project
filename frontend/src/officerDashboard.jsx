@@ -1,607 +1,445 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import "./OfficerDashboard.css";
+import React, { useEffect, useState } from "react";
+import "./officerDashboard.css";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 function OfficerDashboard() {
-  const email = localStorage.getItem("email");
-  const role = localStorage.getItem("role");
-  const token = localStorage.getItem("token");
+    const [users, setUsers] = useState([]);
+    const [crops, setCrops] = useState([]);
+    const [requests, setRequests] = useState([]);
+    const [advisories, setAdvisories] = useState([]);
+    const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const [requests, setRequests] = useState([]);
-  const [crops, setCrops] = useState([]);
-  const [officer, setOfficer] = useState(null);
+    const [title, setTitle] = useState("");
+    const [answer, setAnswer] = useState("");
 
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+    const token = localStorage.getItem("token");
 
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+    const authHeaders = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+    };
 
-  const apiHeaders = {
-    Authorization: `Bearer ${token}`
-  };
+    useEffect(() => {
+        fetchUsers();
+        fetchCrops();
+        fetchRequests();
+        fetchAdvisories();
+    }, []);
 
-  useEffect(() => {
-    loadOfficerData();
-  }, []);
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/users`, {
+                headers: authHeaders
+            });
 
-  const loadOfficerData = async () => {
-    try {
-      setLoading(true);
-      setMessage("");
-
-      const usersResponse = await axios.get(
-        "http://localhost:8080/api/users",
-        {
-          headers: apiHeaders
-        }
-      );
-
-      const currentOfficer = usersResponse.data.find(
-        (user) =>
-          user.email === email &&
-          user.role === "OFFICER"
-      );
-
-      if (!currentOfficer) {
-        setMessage("Officer account not found.");
-        return;
-      }
-
-      setOfficer(currentOfficer);
-
-      const cropsResponse = await axios.get(
-        "http://localhost:8080/api/crops",
-        {
-          headers: apiHeaders
-        }
-      );
-
-      setCrops(cropsResponse.data);
-
-      await loadRequests();
-
-    } catch (error) {
-      console.error("Failed to load officer data:", error);
-
-      if (error.response) {
-        setMessage("Unable to load officer data.");
-      } else {
-        setMessage("Backend server is not connected.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadRequests = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/api/advisory-requests",
-        {
-          headers: apiHeaders
-        }
-      );
-
-      setRequests(response.data);
-    } catch (error) {
-      console.error("Failed to load requests:", error);
-      setMessage("Unable to load advisory requests.");
-    }
-  };
-
-  const handleSelectRequest = (request) => {
-    setSelectedRequest(request);
-    setTitle("");
-    setContent("");
-    setMessage("");
-  };
-
-  const handleSubmitAdvisory = async (e) => {
-    e.preventDefault();
-
-    if (!selectedRequest) {
-      setMessage("Please select a request.");
-      return;
-    }
-
-    if (!title.trim()) {
-      setMessage("Please enter an advisory title.");
-      return;
-    }
-
-    if (!content.trim()) {
-      setMessage("Please enter the advisory content.");
-      return;
-    }
-
-    if (!officer) {
-      setMessage("Officer account not found.");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      setMessage("");
-
-      const cropId =
-        selectedRequest.crop?.cropId;
-
-      if (!cropId) {
-        setMessage("Crop information is missing.");
-        return;
-      }
-
-      const advisoryData = {
-        advisoryId: 0,
-        crop: {
-          cropId: cropId
-        },
-        officer: {
-          userId: officer.userId
-        },
-        title: title,
-        content: content,
-        createdAt: new Date().toISOString()
-      };
-
-      const advisoryResponse = await axios.post(
-        "http://localhost:8080/api/advisories",
-        advisoryData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      const createdAdvisory =
-        advisoryResponse.data;
-
-      const updateData = {
-        requestId: selectedRequest.requestId,
-
-        farmer: selectedRequest.farmer
-          ? {
-              userId: selectedRequest.farmer.userId
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data);
             }
-          : null,
-
-        crop: {
-          cropId: cropId
-        },
-
-        advisory: {
-          advisoryId: createdAdvisory.advisoryId
-        },
-
-        question: selectedRequest.question,
-        status: "RESOLVED",
-        createdAt: selectedRequest.createdAt
-      };
-
-      await axios.put(
-        `http://localhost:8080/api/advisory-requests/${selectedRequest.requestId}`,
-        updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+        } catch (error) {
+            console.error("Error fetching users:", error);
         }
-      );
+    };
 
-      setMessage(
-        "Advisory submitted and request resolved successfully! ✅"
-      );
+    const fetchCrops = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/crops`, {
+                headers: authHeaders
+            });
 
-      setTitle("");
-      setContent("");
-      setSelectedRequest(null);
+            if (response.ok) {
+                const data = await response.json();
+                setCrops(data);
+            }
+        } catch (error) {
+            console.error("Error fetching crops:", error);
+        }
+    };
 
-      await loadRequests();
+    const fetchRequests = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/advisory-requests`, {
+                headers: authHeaders
+            });
 
-    } catch (error) {
-      console.error(
-        "Failed to submit advisory:",
-        error
-      );
+            if (response.ok) {
+                const data = await response.json();
+                setRequests(data);
+            }
+        } catch (error) {
+            console.error("Error fetching requests:", error);
+        }
+    };
 
-      if (error.response) {
-        console.error(
-          "Backend response:",
-          error.response.data
-        );
+    const fetchAdvisories = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/advisories`, {
+                headers: authHeaders
+            });
 
-        setMessage(
-          "Unable to submit advisory. Please check the request data."
-        );
-      } else {
-        setMessage(
-          "Backend server is not connected."
-        );
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+            if (response.ok) {
+                const data = await response.json();
+                setAdvisories(data);
+            }
+        } catch (error) {
+            console.error("Error fetching advisories:", error);
+        }
+    };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
-    localStorage.removeItem("role");
+    const handleRequestClick = async (request) => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/advisory-requests/${request.requestId}`,
+                {
+                    headers: authHeaders
+                }
+            );
 
-    window.location.reload();
-  };
+            if (response.ok) {
+                const data = await response.json();
+                setSelectedRequest(data);
+                setTitle("");
+                setAnswer("");
+            }
+        } catch (error) {
+            console.error("Error fetching request:", error);
+        }
+    };
 
-  const pendingRequests = requests.filter(
-    (request) =>
-      request.status === "PENDING"
-  );
+    const handleResolveRequest = async () => {
+        if (!selectedRequest) {
+            return;
+        }
 
-  const resolvedRequests = requests.filter(
-    (request) =>
-      request.status === "RESOLVED"
-  );
+        if (!title.trim() || !answer.trim()) {
+            alert("Please enter advisory title and answer");
+            return;
+        }
 
-  return (
-    <div className="officer-dashboard">
+        try {
+            const advisoryResponse = await fetch(
+                `${API_URL}/api/advisories`,
+                {
+                    method: "POST",
+                    headers: authHeaders,
+                    body: JSON.stringify({
+                        title: title,
+                        answer: answer,
+                        requestId: selectedRequest.requestId
+                    })
+                }
+            );
 
-      <header className="officer-header">
+            if (!advisoryResponse.ok) {
+                alert("Failed to create advisory");
+                return;
+            }
 
-        <div>
-          <h1>🌱 Crop Advisory</h1>
-          <p>Officer Dashboard</p>
-        </div>
+            const resolveResponse = await fetch(
+                `${API_URL}/api/advisory-requests/${selectedRequest.requestId}`,
+                {
+                    method: "PUT",
+                    headers: authHeaders,
+                    body: JSON.stringify({
+                        status: "RESOLVED"
+                    })
+                }
+            );
 
-        <div className="officer-user">
+            if (!resolveResponse.ok) {
+                alert("Advisory created but request could not be resolved");
+                return;
+            }
 
-          <span>{email}</span>
+            alert("Request resolved successfully");
 
-          <span className="officer-role">
-            {role}
-          </span>
+            setSelectedRequest(null);
+            setTitle("");
+            setAnswer("");
 
-          <button onClick={handleLogout}>
-            Logout
-          </button>
+            fetchRequests();
+            fetchAdvisories();
+        } catch (error) {
+            console.error("Error resolving request:", error);
+            alert("Something went wrong");
+        }
+    };
 
-        </div>
+    const pendingRequests = requests.filter(
+        (request) => request.status === "PENDING"
+    );
 
-      </header>
+    const resolvedRequests = requests.filter(
+        (request) => request.status === "RESOLVED"
+    );
 
-      <main className="officer-content">
+    return (
+        <div className="officer-dashboard">
 
-        <div className="officer-welcome">
-
-          <h2>
-            Welcome, Officer 👋
-          </h2>
-
-          <p>
-            Review farmer questions and provide
-            crop advisory guidance.
-          </p>
-
-        </div>
-
-        {message && (
-          <div className="officer-message">
-            {message}
-          </div>
-        )}
-
-        <div className="officer-summary">
-
-          <div className="summary-card">
-            <span className="summary-icon">
-              📋
-            </span>
-
-            <h3>
-              Pending Requests
-            </h3>
-
-            <strong>
-              {pendingRequests.length}
-            </strong>
-          </div>
-
-          <div className="summary-card">
-            <span className="summary-icon">
-              ✅
-            </span>
-
-            <h3>
-              Resolved Requests
-            </h3>
-
-            <strong>
-              {resolvedRequests.length}
-            </strong>
-          </div>
-
-          <div className="summary-card">
-            <span className="summary-icon">
-              🌱
-            </span>
-
-            <h3>
-              Available Crops
-            </h3>
-
-            <strong>
-              {crops.length}
-            </strong>
-          </div>
-
-        </div>
-
-        <section className="request-section">
-
-          <div className="section-heading">
-
-            <div>
-              <h2>
-                Farmer Advisory Requests
-              </h2>
-
-              <p>
-                Select a pending request to provide
-                an advisory.
-              </p>
+            <div className="dashboard-header">
+                <h1>Officer Dashboard</h1>
+                <p>Manage farmer requests and provide crop advisories</p>
             </div>
 
-            <button
-              className="refresh-button"
-              onClick={loadRequests}
-            >
-              🔄 Refresh
-            </button>
+            <div className="dashboard-stats">
 
-          </div>
+                <div className="stat-card">
+                    <h3>Pending Requests</h3>
+                    <p>{pendingRequests.length}</p>
+                </div>
 
-          {loading ? (
-            <p className="empty-message">
-              Loading requests...
-            </p>
-          ) : pendingRequests.length === 0 ? (
-            <p className="empty-message">
-              No pending advisory requests.
-            </p>
-          ) : (
+                <div className="stat-card">
+                    <h3>Resolved Requests</h3>
+                    <p>{resolvedRequests.length}</p>
+                </div>
 
-            <div className="request-list">
+                <div className="stat-card">
+                    <h3>Available Crops</h3>
+                    <p>{crops.length}</p>
+                </div>
 
-              {pendingRequests.map((request) => (
+                <div className="stat-card">
+                    <h3>Total Users</h3>
+                    <p>{users.length}</p>
+                </div>
 
-                <div
-                  className="request-card"
-                  key={request.requestId}
-                >
+            </div>
 
-                  <div className="request-card-top">
+            <div className="dashboard-content">
 
-                    <h3>
-                      Request #{request.requestId}
-                    </h3>
+                <div className="requests-section">
 
-                    <span className="pending-badge">
-                      PENDING
-                    </span>
+                    <h2>Farmer Advisory Requests</h2>
 
-                  </div>
+                    {requests.length === 0 ? (
+                        <p>No advisory requests found.</p>
+                    ) : (
+                        <div className="request-list">
 
-                  <p>
-                    <strong>Farmer:</strong>{" "}
-                    {request.farmer?.name ||
-                      "Farmer"}
-                  </p>
+                            {requests.map((request) => (
+                                <div
+                                    key={request.requestId}
+                                    className={`request-card ${
+                                        request.status === "RESOLVED"
+                                            ? "resolved"
+                                            : "pending"
+                                    }`}
+                                    onClick={() => handleRequestClick(request)}
+                                >
 
-                  <p>
-                    <strong>Crop:</strong>{" "}
-                    {request.crop?.cropName ||
-                      "Not available"}
-                  </p>
+                                    <div className="request-header">
+                                        <h3>
+                                            Request #{request.requestId}
+                                        </h3>
 
-                  <p>
-                    <strong>Question:</strong>{" "}
-                    {request.question ||
-                      "No question"}
-                  </p>
+                                        <span
+                                            className={`status ${
+                                                request.status === "RESOLVED"
+                                                    ? "status-resolved"
+                                                    : "status-pending"
+                                            }`}
+                                        >
+                                            {request.status}
+                                        </span>
+                                    </div>
 
-                  <button
-                    className="answer-button"
-                    onClick={() =>
-                      handleSelectRequest(
-                        request
-                      )
-                    }
-                  >
-                    Provide Advisory
-                  </button>
+                                    <p>
+                                        <strong>Farmer:</strong>{" "}
+                                        {request.farmerName ||
+                                            request.farmer?.name ||
+                                            request.farmer?.email ||
+                                            "Unknown"}
+                                    </p>
+
+                                    <p>
+                                        <strong>Crop:</strong>{" "}
+                                        {request.cropName ||
+                                            request.crop?.cropName ||
+                                            request.crop?.name ||
+                                            "Not specified"}
+                                    </p>
+
+                                    <p>
+                                        <strong>Question:</strong>{" "}
+                                        {request.question ||
+                                            request.description ||
+                                            "No question provided"}
+                                    </p>
+
+                                    {request.status === "RESOLVED" && (
+                                        <p className="resolved-text">
+                                            Advisory already provided
+                                        </p>
+                                    )}
+
+                                </div>
+                            ))}
+
+                        </div>
+                    )}
 
                 </div>
 
-              ))}
+                {selectedRequest && (
+                    <div className="advisory-section">
 
-            </div>
+                        <div className="advisory-form">
 
-          )}
+                            <h2>
+                                Resolve Request #
+                                {selectedRequest.requestId}
+                            </h2>
 
-        </section>
+                            <div className="request-details">
 
-        {selectedRequest && (
+                                <p>
+                                    <strong>Farmer:</strong>{" "}
+                                    {selectedRequest.farmerName ||
+                                        selectedRequest.farmer?.name ||
+                                        selectedRequest.farmer?.email ||
+                                        "Unknown"}
+                                </p>
 
-          <section className="advisory-form-section">
+                                <p>
+                                    <strong>Crop:</strong>{" "}
+                                    {selectedRequest.cropName ||
+                                        selectedRequest.crop?.cropName ||
+                                        selectedRequest.crop?.name ||
+                                        "Not specified"}
+                                </p>
 
-            <h2>
-              Provide Advisory 💬
-            </h2>
+                                <p>
+                                    <strong>Question:</strong>{" "}
+                                    {selectedRequest.question ||
+                                        selectedRequest.description ||
+                                        "No question provided"}
+                                </p>
 
-            <div className="selected-request">
+                                <p>
+                                    <strong>Status:</strong>{" "}
+                                    {selectedRequest.status}
+                                </p>
 
-              <h3>
-                Request #{selectedRequest.requestId}
-              </h3>
+                            </div>
 
-              <p>
-                <strong>Crop:</strong>{" "}
-                {selectedRequest.crop?.cropName ||
-                  "Not available"}
-              </p>
+                            {selectedRequest.status === "PENDING" ? (
+                                <>
+                                    <div className="form-group">
+                                        <label>Advisory Title</label>
 
-              <p>
-                <strong>Farmer Question:</strong>
-              </p>
+                                        <input
+                                            type="text"
+                                            value={title}
+                                            onChange={(e) =>
+                                                setTitle(e.target.value)
+                                            }
+                                            placeholder="Enter advisory title"
+                                        />
+                                    </div>
 
-              <p className="question-text">
-                {selectedRequest.question}
-              </p>
+                                    <div className="form-group">
+                                        <label>Advisory Answer</label>
 
-            </div>
+                                        <textarea
+                                            value={answer}
+                                            onChange={(e) =>
+                                                setAnswer(e.target.value)
+                                            }
+                                            placeholder="Enter detailed farming guidance"
+                                            rows="6"
+                                        />
+                                    </div>
 
-            <form
-              onSubmit={handleSubmitAdvisory}
-            >
+                                    <div className="form-buttons">
 
-              <label>
-                Advisory Title
-              </label>
+                                        <button
+                                            onClick={handleResolveRequest}
+                                            className="resolve-button"
+                                        >
+                                            Resolve Request
+                                        </button>
 
-              <input
-                type="text"
-                value={title}
-                onChange={(e) =>
-                  setTitle(e.target.value)
-                }
-                placeholder="Example: Rice irrigation guidance"
-              />
+                                        <button
+                                            onClick={() =>
+                                                setSelectedRequest(null)
+                                            }
+                                            className="cancel-button"
+                                        >
+                                            Cancel
+                                        </button>
 
-              <label>
-                Advisory Content
-              </label>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="already-resolved">
+                                    <h3>Request Already Resolved</h3>
 
-              <textarea
-                value={content}
-                onChange={(e) =>
-                  setContent(e.target.value)
-                }
-                placeholder="Enter detailed farming guidance..."
-                rows="6"
-              />
+                                    <p>
+                                        This request has already been handled
+                                        by the officer.
+                                    </p>
 
-              <div className="form-buttons">
+                                    <button
+                                        onClick={() =>
+                                            setSelectedRequest(null)
+                                        }
+                                        className="cancel-button"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            )}
 
-                <button
-                  type="submit"
-                  className="submit-advisory-button"
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? "Submitting..."
-                    : "Submit Advisory & Resolve"}
-                </button>
-
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => {
-                    setSelectedRequest(null);
-                    setTitle("");
-                    setContent("");
-                    setMessage("");
-                  }}
-                >
-                  Cancel
-                </button>
-
-              </div>
-
-            </form>
-
-          </section>
-
-        )}
-
-        {resolvedRequests.length > 0 && (
-
-          <section className="resolved-section">
-
-            <h2>
-              Recently Resolved Requests ✅
-            </h2>
-
-            <div className="request-list">
-
-              {resolvedRequests.map(
-                (request) => (
-
-                  <div
-                    className="request-card resolved-card"
-                    key={request.requestId}
-                  >
-
-                    <div className="request-card-top">
-
-                      <h3>
-                        Request #
-                        {request.requestId}
-                      </h3>
-
-                      <span className="resolved-badge">
-                        RESOLVED
-                      </span>
+                        </div>
 
                     </div>
-
-                    <p>
-                      <strong>Crop:</strong>{" "}
-                      {request.crop?.cropName ||
-                        "Not available"}
-                    </p>
-
-                    <p>
-                      <strong>Question:</strong>{" "}
-                      {request.question}
-                    </p>
-
-                    {request.advisory && (
-                      <>
-                        <p>
-                          <strong>
-                            Advisory:
-                          </strong>{" "}
-                          {request.advisory.title}
-                        </p>
-
-                        <p>
-                          <strong>
-                            Answer:
-                          </strong>{" "}
-                          {request.advisory.content}
-                        </p>
-                      </>
-                    )}
-
-                  </div>
-
-                )
-              )}
+                )}
 
             </div>
 
-          </section>
+            <div className="advisories-section">
 
-        )}
+                <h2>Advisories</h2>
 
-      </main>
+                {advisories.length === 0 ? (
+                    <p>No advisories available.</p>
+                ) : (
+                    <div className="advisory-list">
 
-    </div>
-  );
+                        {advisories.map((advisory) => (
+                            <div
+                                key={advisory.advisoryId}
+                                className="advisory-card"
+                            >
+
+                                <h3>
+                                    {advisory.title ||
+                                        "Crop Advisory"}
+                                </h3>
+
+                                <p>
+                                    {advisory.answer ||
+                                        advisory.description ||
+                                        "No advisory details available"}
+                                </p>
+
+                                {advisory.requestId && (
+                                    <small>
+                                        Request #{advisory.requestId}
+                                    </small>
+                                )}
+
+                            </div>
+                        ))}
+
+                    </div>
+                )}
+
+            </div>
+
+        </div>
+    );
 }
 
 export default OfficerDashboard;
